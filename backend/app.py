@@ -53,22 +53,6 @@ if FRONTEND_DIR.exists():
 
 else:
     logger.warning("Frontend folder not found — skipping static mount.")
-
-
-# ---------------------------------------------------------
-# ROUTERS
-# ---------------------------------------------------------
-app.include_router(chat.router)
-app.include_router(transactions.router)
-app.include_router(ai_insights.router)
-app.include_router(voice.router)
-app.include_router(invoices.router)
-app.include_router(agents.router)  # Autonomous Agentic AI
-
-
-# ---------------------------------------------------------
-# STARTUP & SHUTDOWN EVENTS
-# ---------------------------------------------------------
 @app.on_event("startup")
 async def startup_event():
     await connect_to_mongo()
