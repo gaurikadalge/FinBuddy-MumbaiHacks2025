@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinBuddy AI - Chat</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/styles.css">
+
+    <!-- Init Theme -->
+    <script src="/assets/js/utils.js"></script>
+    <script>FinBuddyUtils.initTheme();</script>
+
+    <style>
+        .typing-dots span {
+            height: 8px;
+            width: 8px;
+            background: #666;
+            border-radius: 50%;
+            display: inline-block;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(.8);
+                opacity: .5;
+            }
+
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .suggestions-container {
+            background: var(--card-bg);
+            padding: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .suggestion-btn {
+            border-radius: 20px;
+            margin: 4px;
+            background: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .suggestion-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .chat-container {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--input-bg);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            max-width: 85%;
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .bot-message {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 5px;
+            color: var(--text-color);
+        }
+
+        .voice-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .recording {
+            animation: pulse 1.5s infinite;
+            background: #dc3545 !important;
+            color: #fff;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, .7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+
+        .input-area {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+
+<body class="page-shell">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i class="fas fa-robot me-2 fa-lg"></i>
+                <span>FinBuddy AI</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/chat"><i class="fas fa-comment me-1"></i> Chat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard"><i class="fas fa-chart-bar me-1"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <button class="btn theme-toggle" onclick="FinBuddyUtils.toggleTheme()" title="Toggle Dark Mode">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="chat-container animate-fade-in">
+
+                    <div class="card-header bg-primary text-white p-3">
+                        <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Chat with FinBuddy</h5>
+                        <small>Ask anything about finance!</small>
+                    </div>
+
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="message bot-message">
+                            <strong>FinBuddy 🤖</strong><br>
+                            Hello! I'm your AI finance assistant.<br><br>
+                            You can ask things like:<br>
+                            • "What's my balance?"<br>
+                            • "Add petrol expense ₹500"<br>
+                            • "Show recent transactions"<br>
+                            • "Tax saving options"
+                        </div>
+                    </div>
+
+                    <div id="suggestions" class="suggestions-container d-none"></div>
+
+                    <div class="p-3 input-area">
+                        <div class="input-group input-group-lg">
+                            <input type="text" id="messageInput" class="form-control" placeholder="Type a message..."
+                                autocomplete="off">
+
+                            <button id="voiceBtn" class="btn btn-outline-success voice-btn ms-2">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+
+                            <button id="sendBtn" class="btn btn-primary px-4 ms-2 rounded-end">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-2">&copy; 2025 FinBuddy AI. All rights reserved.</p>
+            <p class="small text-muted mb-0">
+                Powered by <a href="#" class="text-decoration-none">GenAI</a> & <a href="#"
+                    class="text-decoration-none">FastAPI</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/voice.js"></script>
+    <script src="/assets/js/chat.js"></script>
+</body>
+
+</html>

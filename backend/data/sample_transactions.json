@@ -1,0 +1,87 @@
+[
+  {
+    "id": "sample_1",
+    "txn_type": "Credited",
+    "amount": 2500,
+    "counterparty": "John Doe",
+    "message": "Your account xxxxx1234 credited with Rs. 2,500 from John Doe",
+    "category": "Income: Transfer",
+    "ai_insight": "UPI credit detected - if this is freelance income, record for ITR and GST checks.",
+    "date": "2024-01-15T10:30:00"
+  },
+  {
+    "id": "sample_2",
+    "txn_type": "Debited",
+    "amount": 350,
+    "counterparty": "Swiggy",
+    "message": "Your account xxxxx1234 debited with Rs. 350.00 for Swiggy",
+    "category": "Expense: Food & Dining",
+    "ai_insight": "Food delivery expense - consider home cooking for better savings.",
+    "date": "2024-01-15T12:45:00"
+  },
+  {
+    "id": "sample_3",
+    "txn_type": "Debited",
+    "amount": 500,
+    "counterparty": "Petrol Pump",
+    "message": "Rs. 500.00 debited for fuel at IOCL Petrol Pump",
+    "category": "Expense: Travel",
+    "ai_insight": "Fuel expense - maintain log for business travel deductions.",
+    "date": "2024-01-14T08:20:00"
+  },
+  {
+    "txn_type": "Credited",
+    "amount": 2500.0,
+    "counterparty": "john doe",
+    "message": "Your account xxxxx1234 credited with Rs. 2,500 from John Doe",
+    "category": "Income: Other",
+    "ai_insight": "Transaction analysis completed",
+    "compliance_alert": null,
+    "id": "txn_20251118230300672068",
+    "date": "2025-11-18 23:03:00.672068"
+  },
+  {
+    "txn_type": "Credited",
+    "amount": 2500.0,
+    "counterparty": "john doe",
+    "message": "Your account xxxxx1234 credited with Rs. 2,500 from John Doe",
+    "category": "Income: Other",
+    "ai_insight": "Transaction analysis completed",
+    "compliance_alert": null,
+    "id": "txn_20251118231240526637",
+    "date": "2025-11-18 23:12:40.526637"
+  },
+  {
+    "txn_type": "Credited",
+    "amount": 2500.0,
+    "counterparty": "john doe",
+    "message": "Your account xxxxx1234 credited with Rs. 2,500 from John Doe",
+    "category": "Income: Other",
+    "ai_insight": "Transaction analysis completed",
+    "compliance_alert": null,
+    "id": "txn_20251118234019436504",
+    "date": "2025-11-18 23:40:19.436504"
+  },
+  {
+    "txn_type": "Credited",
+    "amount": 2500.0,
+    "counterparty": "john doe",
+    "message": "Your account xxxxx1234 credited with Rs. 2,500 from John Doe",
+    "category": "Income: Other",
+    "ai_insight": "Transaction analysis completed",
+    "compliance_alert": null,
+    "id": "txn_20251118235053020927",
+    "date": "2025-11-18 23:50:53.020927"
+  },
+  {
+    "txn_type": "Credited",
+    "amount": 2500.0,
+    "counterparty": "anuj",
+    "message": "Your account xxxxx1234 credited with Rs. 2,500 from Anuj",
+    "category": "Income: Other",
+    "ai_insight": "Transaction analysis completed",
+    "compliance_alert": null,
+    "id": "txn_20251119112532066156",
+    "date": "2025-11-19 11:25:32.066156"
+  }
+]
