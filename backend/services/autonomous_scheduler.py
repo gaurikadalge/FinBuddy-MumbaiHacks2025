@@ -323,23 +323,179 @@ class AutonomousScheduler:
     
     def check_goal_tracker(self, transactions: List[Dict]):
         """Track financial goals"""
-        self.agent_states["goal_tracker"]["last_check"] = datetime.now().isoformat()
-        # TODO: Implement goal tracking logic
+        try:
+            # Mock goals for demo (in production, fetch from DB)
+            goals = [
+                {"name": "Emergency Fund", "target": 50000, "current": 20000, "deadline": "2025-12-31"},
+                {"name": "New Laptop", "target": 80000, "current": 15000, "deadline": "2025-06-30"}
+            ]
+            
+            alerts = []
+            
+            # Check progress
+            for goal in goals:
+                progress = (goal["current"] / goal["target"]) * 100
+                
+                # Milestone alerts (25%, 50%, 75%, 100%)
+                if progress >= 25 and progress < 30:
+                    alerts.append({
+                        "urgency": "low",
+                        "message": f"🎉 Milestone: {goal['name']} at {progress:.0f}%",
+                        "action": "Keep it up!"
+                    })
+                
+                # Pace check (simple linear projection)
+                # For demo, just trigger a "behind schedule" alert for Laptop
+                if goal["name"] == "New Laptop" and progress < 20:
+                    alerts.append({
+                        "urgency": "medium",
+                        "message": f"⚠️ Goal Risk: {goal['name']} is behind schedule",
+                        "action": "Increase monthly savings by ₹2,000"
+                    })
+            
+            self.agent_states["goal_tracker"]["last_check"] = datetime.now().isoformat()
+            self.agent_states["goal_tracker"]["alerts"] = alerts
+            
+            if alerts:
+                logger.info(f"🎯 Goal Tracker: {len(alerts)} updates")
+                
+        except Exception as e:
+            logger.error(f"Goal Tracker error: {str(e)}")
     
     def check_habit_coach(self, transactions: List[Dict]):
         """Coach better financial habits"""
-        self.agent_states["habit_coach"]["last_check"] = datetime.now().isoformat()
-        # TODO: Implement habit coaching logic
+        try:
+            # Analyze frequency of small expenses
+            from datetime import datetime, timedelta
+            now = datetime.now()
+            thirty_days_ago = now - timedelta(days=30)
+            
+            recent_transactions = [
+                t for t in transactions
+                if datetime.fromisoformat(t.get('date', '')) > thirty_days_ago
+            ]
+            
+            # Count frequencies
+            frequencies = {}
+            spending = {}
+            
+            for t in recent_transactions:
+                category = t.get('category', 'General')
+                amount = t.get('amount', 0)
+                frequencies[category] = frequencies.get(category, 0) + 1
+                spending[category] = spending.get(category, 0) + amount
+            
+            alerts = []
+            
+            # Check for frequent food ordering
+            if frequencies.get('Food', 0) > 10:
+                avg_cost = spending['Food'] / frequencies['Food']
+                alerts.append({
+                    "urgency": "medium",
+                    "message": f"🍔 Habit Alert: Ordered food {frequencies['Food']} times this month",
+                    "action": f"Limit to 2x/week. Potential savings: ₹{avg_cost * 4:,.0f}/month"
+                })
+            
+            # Check for frequent cab rides
+            if frequencies.get('Travel', 0) > 15:
+                alerts.append({
+                    "urgency": "low",
+                    "message": f"🚖 Frequent Travel: {frequencies['Travel']} rides detected",
+                    "action": "Consider monthly pass or carpooling"
+                })
+            
+            self.agent_states["habit_coach"]["last_check"] = datetime.now().isoformat()
+            self.agent_states["habit_coach"]["alerts"] = alerts
+            
+            if alerts:
+                logger.info(f"🏃 Habit Coach: {len(alerts)} insights found")
+                
+        except Exception as e:
+            logger.error(f"Habit Coach error: {str(e)}")
     
     def check_market_intelligence(self, transactions: List[Dict]):
         """Provide market insights"""
-        self.agent_states["market_intelligence"]["last_check"] = datetime.now().isoformat()
-        # TODO: Implement market intelligence logic
+        try:
+            # Mock market data for demo
+            # In production, fetch from financial APIs
+            market_data = {
+                "gold_price_change": -2.5,  # Percent
+                "nifty_change": 1.2,
+                "fd_rates": 7.5
+            }
+            
+            alerts = []
+            
+            # Gold opportunity
+            if market_data["gold_price_change"] < -2.0:
+                alerts.append({
+                    "urgency": "medium",
+                    "message": f"📉 Market Opportunity: Gold prices dropped {abs(market_data['gold_price_change'])}%",
+                    "action": "Good time to invest in Digital Gold"
+                })
+            
+            # FD Rate alert
+            if market_data["fd_rates"] > 7.0:
+                alerts.append({
+                    "urgency": "low",
+                    "message": f"📈 High Interest: FD rates up to {market_data['fd_rates']}%",
+                    "action": "Lock in high rates now"
+                })
+            
+            self.agent_states["market_intelligence"]["last_check"] = datetime.now().isoformat()
+            self.agent_states["market_intelligence"]["alerts"] = alerts
+            
+            if alerts:
+                logger.info(f"📊 Market Intelligence: {len(alerts)} insights")
+                
+        except Exception as e:
+            logger.error(f"Market Intelligence error: {str(e)}")
     
     def check_emergency_responder(self, transactions: List[Dict]):
         """Respond to financial emergencies"""
-        self.agent_states["emergency_responder"]["last_check"] = datetime.now().isoformat()
-        # TODO: Implement emergency response logic
+        try:
+            # Calculate current balance (mock logic based on income - expenses)
+            # In production, fetch real balance
+            total_income = sum(t.get('amount', 0) for t in transactions if t.get('type') == 'credit')
+            total_expense = sum(t.get('amount', 0) for t in transactions if t.get('type') == 'debit')
+            current_balance = total_income - total_expense
+            
+            # Mock low balance for demo if needed, or use calculated
+            # For safety in demo, let's assume a healthy balance unless we want to trigger
+            # But let's add logic to detect low balance
+            
+            alerts = []
+            
+            if current_balance < 5000:
+                alerts.append({
+                    "urgency": "critical",
+                    "message": f"🚨 Low Balance Alert: ₹{current_balance:,.0f} remaining",
+                    "action": "Review upcoming bills immediately"
+                })
+            
+            # Check for upcoming bills (mock)
+            upcoming_bills = [
+                {"name": "Rent", "amount": 15000, "due_days": 3},
+                {"name": "Electricity", "amount": 1200, "due_days": 5}
+            ]
+            
+            total_bills = sum(b["amount"] for b in upcoming_bills)
+            
+            if current_balance < total_bills:
+                alerts.append({
+                    "urgency": "high",
+                    "message": f"⚠️ Cashflow Risk: Bills of ₹{total_bills:,.0f} due in 5 days",
+                    "action": "Shortfall of ₹{total_bills - current_balance:,.0f}. Use emergency fund?"
+                })
+            
+            self.agent_states["emergency_responder"]["last_check"] = datetime.now().isoformat()
+            self.agent_states["emergency_responder"]["alerts"] = alerts
+            
+            if alerts:
+                logger.info(f"🚨 Emergency Responder: {len(alerts)} alerts")
+                
+        except Exception as e:
+            logger.error(f"Emergency Responder error: {str(e)}")
     
     # ==================== BRIEFINGS ====================
     
