@@ -105,9 +105,9 @@ class ChatManager:
             entities = self.ner_extractor.extract_entities(msg)
             logger.info(f"🔍 Extracted Entities: {entities}")
 
-            # 4. Generate Response based on Intent
+            # 4. Generate Response based on Intent (with Context)
             # NOW ASYNC to handle DB calls
-            response_data = await self._generate_response(intent, entities, msg)
+            response_data = await self._generate_response(intent, entities, msg, context)
 
             # 5. Update Memory
             self.memory.add_interaction(msg, response_data['text'], intent, entities)
@@ -124,8 +124,20 @@ class ChatManager:
     # INTERNAL HELPERS
     # ========================================================================================
 
-    async def _generate_response(self, intent, entities, user_message):
-        """Generate response based on ML intent and entities"""
+    async def _generate_response(self, intent, entities, user_message, context=None):
+        """Generate response based on ML intent, entities, and conversation context"""
+        
+        # 0. Context-Aware Intent Refinement
+        # If intent is 'unknown' or generic, check if context implies a follow-up
+        if intent == "unknown" and context:
+            last_interaction = context[0] # Most recent
+            # Example: User says "Why?" after a budget alert
+            if "budget" in last_interaction['metadata'].get('bot_response', '').lower():
+                intent = "explain_budget"
+            elif "score" in last_interaction['metadata'].get('bot_response', '').lower():
+                intent = "explain_score"
+
+        # Map ML intents to response keys
         
         # Map ML intents to response keys
         intent_map = {
@@ -198,7 +210,10 @@ class ChatManager:
             if budget_check["overshoot"]:
                 budget_warning = f"\n📉 **Projection Alert:** {budget_check['message']}"
             
-            # 4. Generate Dynamic Insight
+            # 4. Generate Dynamic Insight (Context-Aware)
+            # Check for smart counseling advice first
+            counseling_advice = await self._generate_counseling_response(category, amount)
+            
             insights = {
                 "Food": "Eating out frequently adds up! Consider cooking at home to save ~30%.",
                 "Travel": "Travel expenses are high. Look for monthly passes or carpooling options.",
@@ -208,7 +223,9 @@ class ChatManager:
                 "General": "Tracking every penny helps! Keep it up to build better financial habits.",
                 "Income": "Great! Consider investing 20% of your income for long-term goals."
             }
-            insight = insights.get(category, insights["General"])
+            
+            # Use counseling advice if available, otherwise fallback to static insight
+            insight = counseling_advice if counseling_advice else insights.get(category, insights["General"])
             
             # 5. SAVE TO DB
             txn_data = {
@@ -294,12 +311,11 @@ class ChatManager:
         elif key:
             return self._response(self.demo_responses[key], key, intent)
             
-        else:
             # Fallback / Unknown
             return {
-                "text": (
-                    "I'm not sure I understood that. I'm still learning! \n"
-                    "Try asking about your balance, adding an expense, tax advice, or your health score."
+                "text": self._format_persona_response(
+                    "I'm not quite sure I understood that. I'm still learning! "
+                    "Try asking about your balance, adding an expense, or checking your health score."
                 ),
                 "type": "general",
                 "intent": "unknown",
@@ -308,6 +324,31 @@ class ChatManager:
                 "suggestions": ["Check balance", "Add expense", "Health Score"],
                 "timestamp": datetime.now().isoformat()
             }
+
+    # ========================================================================================
+    # NEW: CONTEXT & COUNSELING LOGIC
+    # ========================================================================================
+
+    def _format_persona_response(self, raw_text: str, sentiment: str = "neutral") -> str:
+        """Wraps raw text in an empathetic, advisory persona"""
+        prefixes = {
+            "positive": ["Great job! ", "Nice work. ", "Looking good! "],
+            "negative": ["I noticed something concerning. ", "Heads up: ", "Careful there. "],
+            "neutral": ["", "Here's the info: ", ""]
+        }
+        
+        # Simple random selection could be added here
+        prefix = prefixes.get(sentiment, [""])[0]
+        return f"{prefix}{raw_text}"
+
+    async def _generate_counseling_response(self, category: str, amount: float) -> str:
+        """Generates smart advice based on spending"""
+        # In a real app, this would check historical averages
+        if category.lower() == "food" and amount > 2000:
+            return "That's a bit high for a single meal. Cooking at home could save you ~₹5,000/month!"
+        elif category.lower() == "shopping" and amount > 5000:
+            return "Big purchase! Make sure this fits your 50/30/20 rule."
+        return ""
 
     def _response(self, text: str, response_type: str, intent: str):
         """Unified response formatter"""
