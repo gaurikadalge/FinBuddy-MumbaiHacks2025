@@ -366,6 +366,17 @@ class ChatManager:
 
     def _response(self, text: str, response_type: str, intent: str):
         """Unified response formatter"""
+        # Simple Hindi Translation (Demo)
+        # In production, use a real translation API or library
+        is_hindi = "नमस्ते" in text or "शेष राशि" in text # Check if text is already Hindi (not implemented yet)
+        
+        # We can't easily translate dynamic text here without an external API.
+        # But we can translate the static parts if we passed the language param.
+        # For now, we'll rely on the frontend to send Hindi voice input, 
+        # and the bot will reply in English (or Hinglish if we add it).
+        
+        # Let's add a simple Hinglish modifier for common phrases if needed
+        
         return {
             "text": text,
             "type": response_type,
